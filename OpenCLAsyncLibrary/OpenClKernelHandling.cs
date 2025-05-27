@@ -954,6 +954,58 @@ namespace OpenCLAsyncLibrary
 			// Return input buffer textbox
 			return inputBufferTextbox;
 		}
+		
+		public Dictionary<CLKernel, string> PrecompileAllKernels(bool cache)
+		{
+			// Get all kernel files
+			string[] kernelFiles = this.Files.Keys.ToArray();
+
+			// Precompile all kernels
+			Dictionary<CLKernel, string> precompiledKernels = [];
+			foreach (string kernelFile in kernelFiles)
+			{
+				// Compile kernel
+				CLKernel? kernel = this.CompileFile(kernelFile);
+				if (kernel != null)
+				{
+					precompiledKernels.Add(kernel.Value, kernelFile);
+				}
+				else
+				{
+					this.Log("Error compiling kernel: " + kernelFile, "", 2);
+				}
+			}
+
+			this.UnloadKernel();
+
+			// Cache
+			if (cache)
+			{
+				this.kernelCache = precompiledKernels;
+			}
+
+			return precompiledKernels;
+		}
+
+		public string GetLatestKernelFile(string searchName = "")
+		{
+			string[] files = this.Files.Keys.ToArray();
+
+			// Get all files that contain searchName
+			string[] filteredFiles = files.Where(file => file.Contains(searchName, StringComparison.OrdinalIgnoreCase)).ToArray();
+			string latestFile = filteredFiles.Select(file => new FileInfo(file))
+				.OrderByDescending(file => file.LastWriteTime)
+				.FirstOrDefault()?.FullName ?? "";
+
+			// Return latest file
+			if (string.IsNullOrEmpty(latestFile))
+			{
+				this.Log("No kernel files found with name: " + searchName);
+				return "";
+			}
+
+			return latestFile;
+		}
 
 
 
@@ -1369,57 +1421,7 @@ namespace OpenCLAsyncLibrary
 			}
 		}
 
-		public Dictionary<CLKernel, string> PrecompileAllKernels(bool cache)
-		{
-			// Get all kernel files
-			string[] kernelFiles = this.Files.Keys.ToArray();
-
-			// Precompile all kernels
-			Dictionary<CLKernel, string> precompiledKernels = [];
-			foreach (string kernelFile in kernelFiles)
-			{
-				// Compile kernel
-				CLKernel? kernel = this.CompileFile(kernelFile);
-				if (kernel != null)
-				{
-					precompiledKernels.Add(kernel.Value, kernelFile);
-				}
-				else
-				{
-					this.Log("Error compiling kernel: " + kernelFile, "", 2);
-				}
-			}
-
-			this.UnloadKernel();
-
-			// Cache
-			if (cache)
-			{
-				this.kernelCache = precompiledKernels;
-			}
-
-			return precompiledKernels;
-		}
-
-		public string GetLatestKernelFile(string searchName = "")
-		{
-			string[] files = this.Files.Keys.ToArray();
-
-			// Get all files that contain searchName
-			string[] filteredFiles = files.Where(file => file.Contains(searchName, StringComparison.OrdinalIgnoreCase)).ToArray();
-			string latestFile = filteredFiles.Select(file => new FileInfo(file))
-				.OrderByDescending(file => file.LastWriteTime)
-				.FirstOrDefault()?.FullName ?? "";
-
-			// Return latest file
-			if (string.IsNullOrEmpty(latestFile))
-			{
-				this.Log("No kernel files found with name: " + searchName);
-				return "";
-			}
-
-			return latestFile;
-		}
+		
 
 
 

@@ -723,6 +723,87 @@ namespace OpenCLAsycLibrary
 				KeyPreview = true
 			};
 
+			// Pfeiltasten-Event für Fullscreen-Form
+			this.fullScreenForm.KeyDown += (s, args) =>
+			{
+				if (args.KeyCode == Keys.Escape)
+				{
+					this.fullScreenForm?.Close();
+					this.fullScreenForm = null;
+					return;
+				}
+
+				if (args.KeyCode == Keys.C)
+				{
+					this.checkBox_crosshair.Checked = !this.checkBox_crosshair.Checked;
+					this.button_exec_Click(sender, e);
+				}
+
+				// Beispiel: Reagiere auf Pfeiltasten
+				if (args.KeyCode == Keys.Left)
+				{
+					NumericUpDown? numericRotY = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("rot") && x.Name.ToLower().Contains("y"));
+					if (numericRotY != null)
+					{
+						this.UpdateNumericValue(numericRotY, 0.033M);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+				}
+				else if (args.KeyCode == Keys.Right)
+				{
+					NumericUpDown? numericRotY = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("rot") && x.Name.ToLower().Contains("y"));
+					if (numericRotY != null)
+					{
+						this.UpdateNumericValue(numericRotY, -0.033M);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+				}
+				else if (args.KeyCode == Keys.Up)
+				{
+					NumericUpDown? numericRotX = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("rot") && x.Name.ToLower().Contains("x"));
+					if (numericRotX != null)
+					{
+						this.UpdateNumericValue(numericRotX, 0.033M);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+					
+				}
+				else if (args.KeyCode == Keys.Down)
+				{
+					NumericUpDown? numericRotX = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("rot") && x.Name.ToLower().Contains("x"));
+					if (numericRotX != null)
+					{
+						this.UpdateNumericValue(numericRotX, -0.033M);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+				}
+				else if (args.KeyCode == Keys.PageUp)
+				{
+					NumericUpDown? numericRotZ = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("rot") && x.Name.ToLower().Contains("z"));
+					if (numericRotZ != null)
+					{
+						this.UpdateNumericValue(numericRotZ, -0.033M);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+				}
+				else if (args.KeyCode == Keys.PageDown)
+				{
+					NumericUpDown? numericRotZ = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("rot") && x.Name.ToLower().Contains("z"));
+					if (numericRotZ != null)
+					{
+						this.UpdateNumericValue(numericRotZ, 0.033M);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+				}
+			};
+
+
 			// PictureBox in Originalgröße oder gestreckt anzeigen
 			PictureBox pb = new()
 			{
@@ -781,7 +862,7 @@ namespace OpenCLAsycLibrary
 		{
 			string kernelName = this.comboBox_kernels.SelectedItem?.ToString() ?? "";
 
-			this.ExecuteKernelOOP(-1, this.comboBox_kernels.SelectedItem?.ToString() ?? "");
+			this.ExecuteKernelOOP(-1, kernelName);
 		}
 
 		private void button_create_Click(object sender, EventArgs e)
