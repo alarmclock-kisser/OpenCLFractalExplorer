@@ -39,6 +39,8 @@ namespace OpenCLAsyncLibrary
 			this.Repopath = repopath;
 			this.LogList = logList ?? new ListBox();
 			this.DevicesCombo = devicesComboBox ?? new ComboBox();
+
+			this.DevicesCombo.SelectedIndexChanged += (sender, e) => this.InitContext(this.DevicesCombo.SelectedIndex);
 		}
 
 

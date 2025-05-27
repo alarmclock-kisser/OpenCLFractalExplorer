@@ -757,8 +757,9 @@ namespace OpenCLAsycLibrary
 					{
 						this.UpdateNumericValue(numericRotY, -0.033M);
 						this.button_exec_Click(sender, e);
+						return;
 					}
-					return;
+					
 				}
 				else if (args.KeyCode == Keys.Up)
 				{
@@ -767,9 +768,31 @@ namespace OpenCLAsycLibrary
 					{
 						this.UpdateNumericValue(numericRotX, 0.033M);
 						this.button_exec_Click(sender, e);
+						return;
 					}
-					return;
-					
+
+					NumericUpDown? numericZ = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("zoom"));
+					if (numericZ != null)
+					{
+
+						this.mandelbrotZoomFactor *= (float) this.numericUpDown_zoomFactor.Value;
+
+						// 3. Update zoom value with boundary checks
+						decimal newValue = (decimal) this.mandelbrotZoomFactor;
+						if (newValue < numericZ.Minimum)
+						{
+							newValue = numericZ.Minimum;
+						}
+						if (newValue > numericZ.Maximum)
+						{
+							newValue = numericZ.Maximum;
+						}
+						numericZ.Value = newValue;
+
+						this.button_exec_Click(sender, e);
+						return;
+					}
+
 				}
 				else if (args.KeyCode == Keys.Down)
 				{
@@ -778,8 +801,29 @@ namespace OpenCLAsycLibrary
 					{
 						this.UpdateNumericValue(numericRotX, -0.033M);
 						this.button_exec_Click(sender, e);
+						return;
 					}
-					return;
+					NumericUpDown? numericZ = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("zoom"));
+					if (numericZ != null)
+					{
+
+						this.mandelbrotZoomFactor /= (float) this.numericUpDown_zoomFactor.Value;
+
+						// 3. Update zoom value with boundary checks
+						decimal newValue = (decimal) this.mandelbrotZoomFactor;
+						if (newValue < numericZ.Minimum)
+						{
+							newValue = numericZ.Minimum;
+						}
+						if (newValue > numericZ.Maximum)
+						{
+							newValue = numericZ.Maximum;
+						}
+						numericZ.Value = newValue;
+
+						this.button_exec_Click(sender, e);
+						return;
+					}
 				}
 				else if (args.KeyCode == Keys.PageUp)
 				{
@@ -797,6 +841,26 @@ namespace OpenCLAsycLibrary
 					if (numericRotZ != null)
 					{
 						this.UpdateNumericValue(numericRotZ, 0.033M);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+				}
+				else if (args.KeyCode == Keys.W)
+				{
+					NumericUpDown? numericC = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("corner"));
+					if (numericC != null)
+					{
+						this.UpdateNumericValue(numericC, 1);
+						this.button_exec_Click(sender, e);
+					}
+					return;
+				}
+				else if (args.KeyCode == Keys.S)
+				{
+					NumericUpDown? numericC = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("corner"));
+					if (numericC != null)
+					{
+						this.UpdateNumericValue(numericC, -1);
 						this.button_exec_Click(sender, e);
 					}
 					return;
@@ -863,6 +927,7 @@ namespace OpenCLAsycLibrary
 			string kernelName = this.comboBox_kernels.SelectedItem?.ToString() ?? "";
 
 			this.ExecuteKernelOOP(-1, kernelName);
+			this.RenderArgsIntoPicturebox();
 		}
 
 		private void button_create_Click(object sender, EventArgs e)
