@@ -36,6 +36,10 @@ namespace OpenCLAsycLibrary
 			// Set repopath
 			this.Repopath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\"));
 
+			// Window position
+			this.StartPosition = FormStartPosition.Manual;
+			this.Location = new Point(0, 0);
+
 			// Init CUDA
 			this.CTXH = new OpenClService(this.Repopath, this.listBox_log, this.comboBox_devices);
 
@@ -83,7 +87,7 @@ namespace OpenCLAsycLibrary
 			this.button_create_Click(this, EventArgs.Empty);
 		}
 
-		
+
 
 
 
@@ -431,9 +435,33 @@ namespace OpenCLAsycLibrary
 			// Check if SHIFT key is pressed
 			if (Control.ModifierKeys == Keys.Shift)
 			{
-				// Change zoom factor numeric
-				this.UpdateNumericValue(this.numericUpDown_zoomFactor, e.Delta > 0 ? 0.05m : -0.05m);
-				return;
+				// Change zoomLo value
+				NumericUpDown? numericZoomLo = this.panel_kernelArgs.Controls.OfType<NumericUpDown>().FirstOrDefault(x => x.Name.ToLower().Contains("zoomlo"));
+				if (numericZoomLo == null)
+				{
+					this.CTXH.KernelHandling?.Log("ZoomLo control not found!", "", 3);
+					return;
+				}
+
+				// Increase/Decrease zoomLo
+				if (e.Delta > 0)
+				{
+					numericZoomLo.Value += this.numericUpDown_zoomFactor.Value; // Increase by factor
+				}
+				else if (e.Delta < 0)
+				{
+					if (numericZoomLo.Value > numericZoomLo.Minimum)
+					{
+						numericZoomLo.Value -= this.numericUpDown_zoomFactor.Value; // Decrease by factor
+					}
+				}
+
+				this.kernelExecutionRequired = false;
+				this.button_exec_Click(sender, e);
+				this.RenderArgsIntoPicturebox();
+
+
+
 			}
 
 			// Check for CTRL key press
@@ -635,6 +663,24 @@ namespace OpenCLAsycLibrary
 			}
 
 			numeric.Value = newValue;
+		}
+
+
+
+
+
+		// ----- ----- ----- OVERRIDES ----- ----- ----- \\
+		protected override void OnResize(EventArgs e)
+		{
+			base.OnResize(e);
+
+			if (WindowState == FormWindowState.Maximized)
+			{
+				// Beispiel: Auf 1280x800 begrenzen
+				MaximumSize = new Size(1280, 800);
+				WindowState = FormWindowState.Normal; // Zurückschalten, um Resize zuzulassen
+				Size = MaximumSize;
+			}
 		}
 
 
